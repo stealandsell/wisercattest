@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="your_name" id="create-pet-type-table">
+        <createTable tableName="pet_type">
+            <column name="id" type="bigint" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="your_name" id="insert-pet-type-data">
+        <insert tableName="pet_type">
+            <column name="name" value="Cat"/>
+            <column name="name" value="Dog"/>
+            <column name="name" value="Horse"/>
+            <column name="name" value="Rabbit"/>
+            <column name="name" value="Parrot"/>
+        </insert>
+    </changeSet>
+</databaseChangeLog>
