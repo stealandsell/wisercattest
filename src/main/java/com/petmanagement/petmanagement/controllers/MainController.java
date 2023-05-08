@@ -62,8 +62,6 @@ public class MainController {
         @PostMapping("/login")
         public ResponseEntity<?> loginResponse(@RequestBody UserEntity loginForm) {
 
-
-
             String username = loginForm.getUsername();
             String password = loginForm.getPassword();
 
@@ -170,15 +168,13 @@ public class MainController {
 
 
         //System.out.println(pet.getId());
-        System.out.println(pet.getName());
-        System.out.println(pet.getCode());
+//        System.out.println(pet.getName());
+//        System.out.println(pet.getCode());
 
-        pet.setOwnerId(Math.toIntExact(user.getId()));
-
-        System.out.println("user id");
-        System.out.println(user.getId());
-
-        System.out.println("save pet");
+        if(user != null)
+        {
+            pet.setOwnerId(Math.toIntExact(user.getId()));
+        }
 
 
 //        System.out.println(pet.getName());
@@ -386,16 +382,35 @@ public class MainController {
         private UserService userService;
 
 
+//        @GetMapping("/pets")
+//        public ResponseEntity<?> getPets(@RequestParam("username") String username) {
+
         @GetMapping("/pets")
-        public List<Pet> getPets() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if (authentication == null || !authentication.isAuthenticated()) {
+        public ResponseEntity<?> getPets(@RequestParam("username") String username) {
+            System.out.println(username);
+
+            UserEntity user = userService.findByUsername(username);
+//            System.out.println("user id -  " + user.getId());
+
+
+            //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//            if (authentication == null || !authentication.isAuthenticated()) {
+            if (user == null) {
+
                 // No user logged in, retrieve all pets
-                return petRepository.findAll();
+
+                System.out.println("no user logged in - all users items visible");
+                System.out.println(petRepository.findAll());
+                return new ResponseEntity<>(petRepository.findAll(), HttpStatus.CREATED);
+
+
+//                return petRepository.findAll();
             } else {
                 // User logged in, retrieve pets belonging to that user
-                UserEntity user = userService.getCurrentUser();
-                return petRepository.findByOwnerId(Math.toIntExact(user.getId()));
+
+                //return petRepository.findByOwnerId(Math.toIntExact(user.getId()));
+                System.out.println("user " + username + " logged in - user can see only his pets");
+                return new ResponseEntity<>(petRepository.findByOwnerId(Math.toIntExact(user.getId())), HttpStatus.CREATED);
             }
         }
 
