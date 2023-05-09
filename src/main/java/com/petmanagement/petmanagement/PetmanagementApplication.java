@@ -9,13 +9,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 public class PetmanagementApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PetmanagementApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(PetmanagementApplication.class, args);
+    }
 
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new CorsConfigurer();
-	}
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new CorsConfigurer();
+    }
 
 }

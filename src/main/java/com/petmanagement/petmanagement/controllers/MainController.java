@@ -1,30 +1,26 @@
 package com.petmanagement.petmanagement.controllers;
 
-import com.petmanagement.petmanagement.configurer.MyUserDetails;
 import com.petmanagement.petmanagement.configurer.UserService;
 import com.petmanagement.petmanagement.models.*;
-import com.petmanagement.petmanagement.repo.*;
-import jakarta.servlet.http.HttpServletRequest;
+import com.petmanagement.petmanagement.repo.CountryOfOriginRepository;
+import com.petmanagement.petmanagement.repo.FurColorRepository;
+import com.petmanagement.petmanagement.repo.PetRepository;
+import com.petmanagement.petmanagement.repo.PetTypeRepository;
 import jakarta.validation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Controller
@@ -43,105 +39,6 @@ public class MainController {
 
     @Autowired
     private UserService userService;
-
-
-
-
-
-
-    @SpringBootApplication(exclude = {SecurityAutoConfiguration.class })
-    @RestController
-    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-    public static class login {
-
-
-
-        @Autowired
-        private UserService userService;
-
-        @PostMapping("/login")
-        public ResponseEntity<?> loginResponse(@RequestBody UserEntity loginForm) {
-
-            String username = loginForm.getUsername();
-            String password = loginForm.getPassword();
-
-            UserEntity user = userService.findByUsername(username);
-
-
-            if (user != null && user.getPassword().equals(password)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, userService.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authToken);
-                //String token = username + "verysecuretoken";
-
-                if (user.getPassword().equals(password)) {
-                    // your existing code here
-
-                    return ResponseEntity.ok().body(username);
-                } else {
-                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-                }
-
-
-//                System.out.println("[login] auth token: " + token);
-//
-//                // Return the token as a separate value in the response body
-//                Map<String, String> responseBody = new HashMap<>();
-//                responseBody.put("token", token);
-//                return ResponseEntity.ok().body(responseBody);
-
-
-
-//                HttpHeaders headers = new HttpHeaders();
-//                headers.add("Authorization", "Bearer " + token);
-//                System.out.println("[login] headers: " + headers);
-//
-//
-//                System.out.println(token);
-//
-//                System.out.println(ResponseEntity.ok().header("Authorization", "Bearer " + token).build());
-//
-////                return ResponseEntity.ok().headers(headers).build();
-////                return ResponseEntity.ok().header("Authorization", "Bearer " + token).build();
-////                return ResponseEntity.ok().build();
-//                return new ResponseEntity<>(token, HttpStatus.OK);
-
-
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-            }
-        }
-    }
-
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout() {
-//        SecurityContextHolder.getContext().setAuthentication(null);
-//        return ResponseEntity.ok().build();
-//    }
-
-
-
-    public class ValidationErrorResponse {
-        private List<String> errors;
-
-        public ValidationErrorResponse(List<String> errors) {
-            this.errors = errors;
-        }
-
-        public List<String> getErrors() {
-            return errors;
-        }
-
-        public void setErrors(List<String> errors) {
-            this.errors = errors;
-        }
-    }
-
-
-    //###########################################
-
 
     @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
     @PostMapping("/add")
@@ -167,176 +64,16 @@ public class MainController {
         UserEntity user = userService.findByUsername(username);
 
 
-        //System.out.println(pet.getId());
-//        System.out.println(pet.getName());
-//        System.out.println(pet.getCode());
-
-        if(user != null)
-        {
+        if (user != null) {
             pet.setOwnerId(Math.toIntExact(user.getId()));
         }
 
-
-//        System.out.println(pet.getName());
-//        System.out.println(pet.getCode());
 
         Pet newPet = petRepository.save(pet);
 
         return new ResponseEntity<>(newPet, HttpStatus.CREATED);
     }
 
-    //###########################################
-
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPet(Authentication authentication, @Valid @RequestBody Pet pet) {
-//
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        String username = authentication.getName();
-//        UserEntity user = userService.findByUsername(username);
-//
-//        pet.setOwnerId(Math.toIntExact(user.getId()));
-//
-//        Pet newPet = petRepository.save(pet);
-//
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPet(@AuthenticationPrincipal MyUserDetails userDetails, @Valid @RequestBody Pet pet) {
-//
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        UserEntity user = userService.findByUsername(userDetails.getUsername());
-//
-//        pet.setOwnerId(Math.toIntExact(user.getId()));
-//
-//        Pet newPet = petRepository.save(pet);
-//
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-//
-//
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPet(@AuthenticationPrincipal MyUserDetails userDetails, @Valid @RequestBody Pet pet) {
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//
-//        String username = userDetails.getUsername();
-//        //
-//        System.out.println(username);
-//        //
-//        UserEntity user = userService.findByUsername(username);
-//
-//        pet.setOwnerId(Math.toIntExact(user.getId()));
-//
-//        Pet newPet = petRepository.save(pet);
-//
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPet(HttpServletRequest request, @Valid @RequestBody Pet pet) {
-//
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        String username = request.getUserPrincipal().getName();
-//        UserEntity user = userService.findByUsername(username);
-//
-//        pet.setOwnerId(Math.toIntExact(user.getId()));
-//
-//        Pet newPet = petRepository.save(pet);
-//
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<?> addPet(@Valid @RequestBody Pet pet) {
-//
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//        Pet newPet = petRepository.save(pet);
-//
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-//
 
     @GetMapping("/edit/{id}")
     public ResponseEntity<?> getPetById(@PathVariable Long id) {
@@ -369,58 +106,43 @@ public class MainController {
     }
 
 
-
+    @SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
     @RestController
     @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-    @RequestMapping("/api")
-    public class PetRestController {
-        @Autowired
-        private PetRepository petRepository;
+    public static class login {
 
 
         @Autowired
         private UserService userService;
 
+        @PostMapping("/login")
+        public ResponseEntity<?> loginResponse(@RequestBody UserEntity loginForm) {
 
-//        @GetMapping("/pets")
-//        public ResponseEntity<?> getPets(@RequestParam("username") String username) {
-
-        @GetMapping("/pets")
-        public ResponseEntity<?> getPets(@RequestParam("username") String username) {
-            System.out.println(username);
+            String username = loginForm.getUsername();
+            String password = loginForm.getPassword();
 
             UserEntity user = userService.findByUsername(username);
-//            System.out.println("user id -  " + user.getId());
 
 
-            //Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//            if (authentication == null || !authentication.isAuthenticated()) {
-            if (user == null) {
-
-                // No user logged in, retrieve all pets
-
-                System.out.println("no user logged in - all users items visible");
-                System.out.println(petRepository.findAll());
-                return new ResponseEntity<>(petRepository.findAll(), HttpStatus.CREATED);
+            if (user != null && user.getPassword().equals(password)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(user, null, userService.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authToken);
 
 
-//                return petRepository.findAll();
+                if (user.getPassword().equals(password)) {
+
+
+                    return ResponseEntity.ok().body(username);
+                } else {
+                    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+                }
+
+
             } else {
-                // User logged in, retrieve pets belonging to that user
-
-                //return petRepository.findByOwnerId(Math.toIntExact(user.getId()));
-                System.out.println("user " + username + " logged in - user can see only his pets");
-                return new ResponseEntity<>(petRepository.findByOwnerId(Math.toIntExact(user.getId())), HttpStatus.CREATED);
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
         }
-
-        //
-//        @GetMapping("/pets")
-//        public List<Pet> getPets() {
-//            return petRepository.findAll();
-//        }
     }
-
 
     @RestController
     @CrossOrigin(origins = "http://localhost:4200")
@@ -448,7 +170,6 @@ public class MainController {
         }
     }
 
-
     @RestController
     @CrossOrigin(origins = "http://localhost:4200")
     @RequestMapping("/api")
@@ -462,126 +183,57 @@ public class MainController {
         }
     }
 
+    public class ValidationErrorResponse {
+        private List<String> errors;
+
+        public ValidationErrorResponse(List<String> errors) {
+            this.errors = errors;
+        }
+
+        public List<String> getErrors() {
+            return errors;
+        }
+
+        public void setErrors(List<String> errors) {
+            this.errors = errors;
+        }
+    }
+
+    @RestController
+    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
+    @RequestMapping("/api")
+    public class PetRestController {
+        @Autowired
+        private PetRepository petRepository;
 
 
-//    @GetMapping("/")
-//    public String home(Model model) {
-//        model.addAttribute("title", "Home page");
-//        return "home";
-//    }
-
-//    @GetMapping("/add")
-//    public String addPet(Model model) {
-//        return "add";
-//    }
+        @Autowired
+        private UserService userService;
 
 
+        @GetMapping("/pets")
+        public ResponseEntity<?> getPets(@RequestParam("username") String username) {
+            System.out.println(username);
+
+            UserEntity user = userService.findByUsername(username);
+
+            if (user == null) {
+
+                // No user logged in, retrieve all pets
+
+                System.out.println("no user logged in - all users items visible");
+                System.out.println(petRepository.findAll());
+                return new ResponseEntity<>(petRepository.findAll(), HttpStatus.CREATED);
 
 
-//    @GetMapping("/add")
-//    public String showAddPetForm(Model model) {
-//        // retrieve pet types from the database
-//        Iterable<PetTypeModel> petTypes = petTypeRepository.findAll();
-//
-//        // retrieve fur colors from the database
-//        Iterable<FurColorModel> furColors = furColorRepository.findAll();
-//
-//        // retrieve countries from the database
-//        Iterable<CountryOfOriginModel> countryOfOrigin = countryOfOriginRepository.findAll();
-//
-//        // add the pet types and fur colors to the model
-//        model.addAttribute("petTypes", petTypes);
-//        model.addAttribute("furColors", furColors);
-//        model.addAttribute("countryOfOrigin", countryOfOrigin);
-//
-//        return "add";
-//    }
+            } else {
+                // User logged in, retrieve pets belonging to that user
+
+                System.out.println("user " + username + " logged in - user can see only his pets");
+                return new ResponseEntity<>(petRepository.findByOwnerId(Math.toIntExact(user.getId())), HttpStatus.CREATED);
+            }
+        }
 
 
-
-//    @PostMapping("/add")
-//    public String addPetPost(@RequestParam String name,
-//                             @RequestParam String code,
-//                             @RequestParam String type,
-//                             @RequestParam String fur_color,
-//                             @RequestParam String country_of_origin,
-//                             Model model) {
-//
-//        Pet pet = new Pet(name, code, type, fur_color, country_of_origin);
-//
-//
-//        petRepository.save(pet);
-//
-//        return "redirect:/add";
-//    }
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public String addPet(@RequestParam(value = "name", required = false) String name,
-//                         @RequestParam(value = "code", required = false) String code,
-//                         @RequestParam(value = "type", required = false) String type,
-//                         @RequestParam(value = "fur_color", required = false) String fur_color,
-//                         @RequestParam(value = "country_of_origin", required = false) String country_of_origin,
-//                         Model model){
-//        Pet pet = new Pet(name, code, type, fur_color, country_of_origin);
-//        System.out.println(pet.getCode());
-//        System.out.println(pet.getType());
-//        petRepository.save(pet);
-//        return "redirect:/add";
-//
-//    }
-
-
-
-
-
-
-
-//    @CrossOrigin(origins = "http://localhost:4200", allowedHeaders = "*")
-//    @PostMapping("/add")
-//    public ResponseEntity<Pet> addPet(@Valid @RequestBody Pet pet) {
-//
-//        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-//        Validator validator = factory.getValidator();
-//
-//        Set<ConstraintViolation<Pet>> violations = validator.validate(pet);
-//
-//        if (!violations.isEmpty()) {
-//            List<String> errors = new ArrayList<>();
-//            for (ConstraintViolation<Pet> violation : violations) {
-//                errors.add(violation.getMessage());
-//            }
-//            ValidationErrorResponse response = new ValidationErrorResponse(errors);
-//            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-//        }
-//
-//
-//        Pet newPet = petRepository.save(pet);
-////        System.out.println(newPet.getType());
-////        System.out.println(newPet.getFurColor());
-////        System.out.println(newPet.getCode());
-//        return new ResponseEntity<>(newPet, HttpStatus.CREATED);
-//    }
-
-
-//    @GetMapping("/table")
-//    public String viewTable(Model model) {
-//        List<Pet> pets = petRepository.findAll();
-//        model.addAttribute("title", "table");
-//        model.addAttribute("pets", pets);
-//        return "table";
-//    }
-
-
-//    @GetMapping("/add")
-//    public Pet addPetPost(@RequestBody Pet pet) {
-//
-//        Pet pet = new Pet(name, code, type, fur_color, country_of_origin);
-//
-//        return petRepository.save(pet);
-//
-//    }
-
-
+    }
 }

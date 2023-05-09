@@ -1,14 +1,15 @@
 package com.petmanagement.petmanagement.configurer;
 
-import java.util.Collection;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
+
 public class MyUserDetails implements UserDetails {
 
-    private String username;
-    private String password;
-    private Collection<? extends GrantedAuthority> authorities;
+    private final String username;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
 
     public MyUserDetails(String username, String password, Collection<? extends GrantedAuthority> authorities) {
         this.username = username;

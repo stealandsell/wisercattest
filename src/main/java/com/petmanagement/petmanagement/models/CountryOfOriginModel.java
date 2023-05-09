@@ -1,4 +1,5 @@
 package com.petmanagement.petmanagement.models;
+
 import jakarta.persistence.*;
 
 @Entity
